@@ -1,0 +1,7 @@
+---
+
+dyndns:
+  provider: rackspace
+  interface: eth1
+  hostname: foo-bar.com
+  credentials_file: /etc/cloud-dyndns/.rackspace-api-credentials.json
