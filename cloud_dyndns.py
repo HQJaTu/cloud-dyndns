@@ -30,7 +30,7 @@ def read_config_file(config_file, args_to_update):
     config_in = None
     with open(config_file, 'r') as stream:
         try:
-            config_in = yaml.load(stream)
+            config_in = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             sys.stderr.write(
                 "Error: Error reading configuration file %s. Cannot continue!\nError: %s\n\n" % (config_file, exc))
