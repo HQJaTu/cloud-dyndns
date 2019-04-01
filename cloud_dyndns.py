@@ -8,6 +8,8 @@ import sys
 import yaml
 import socket
 import netifaces
+import requests
+import json
 
 
 # This file is part of Cloud DynDNS.  Cloud DynDNS is free software: you can
@@ -55,6 +57,8 @@ def read_config_file(config_file, args_to_update):
             args_to_update.interface = dyndns_config[key]
         elif key == 'ip_address':
             args_to_update.ip_address = dyndns_config[key]
+        elif key == 'detect_public_ip':
+            args_to_update.detect_public_ip = True
         elif key == 'hostname':
             args_to_update.hostname = dyndns_config[key]
         elif key == 'api_user':
@@ -86,6 +90,13 @@ def get_current_ip_from_interface(iface):
     return ips[netifaces.AF_INET][0]['addr']
 
 
+def get_ipinfoio_address():
+    resp = requests.get('http://ipinfo.io/json')
+    data = resp.json()
+
+    return data['ip']
+
+
 def main():
     provider = None
     default_hostname = socket.getfqdn()
@@ -98,6 +109,8 @@ def main():
                         help='The interface to read IP-address from to set into DNS')
     parser.add_argument('--ip-address',
                         help="Don't try to read IP-address, just use a static one.")
+    parser.add_argument('--ip-address-detect-public', '-d', dest='detect_public_ip', action='store_true',
+                        help="Don't try to read IP-address, see what ipinfo.io detects.")
     parser.add_argument('--hostname', default=default_hostname,
                         help='The hostname to parse DNS zone and RR from. Default: %s' % default_hostname)
     parser.add_argument('--api-user',
@@ -162,6 +175,8 @@ def main():
     if args.ip_address:
         # Using static one. No need to check for interface.
         ip_to_use = args.ip_address
+    elif args.detect_public_ip:
+        ip_to_use = get_ipinfoio_address()
     else:
         # Detect, check that we have interface
         if not args.interface:
