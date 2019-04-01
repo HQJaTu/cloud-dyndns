@@ -5,11 +5,9 @@
 from azure.mgmt.dns import DnsManagementClient
 from azure.common.credentials import ServicePrincipalCredentials
 from msrestazure.azure_exceptions import CloudError
-import pytz
 import os.path
 import sys
 import json
-from tzlocal import get_localzone
 from pathlib import Path
 import re
 from clouddns.base_cloud import BaseCloud

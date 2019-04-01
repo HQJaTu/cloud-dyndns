@@ -7,6 +7,7 @@ Prerequirements:
 * Azure tenant ID
 * Azure subscription ID of DNS zone
 * Service principal ID and secret
+* Python module `azure-mgmt-dns`. Those not familiar with Python, you need to `pip3 install` the package.
 
 To confuse you, all four of those look like a GUID.
 
