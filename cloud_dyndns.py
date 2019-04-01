@@ -135,6 +135,10 @@ def main():
         from clouddns.rackspace import Rackspace
         provider = Rackspace()
         default_credentials_filename = provider.default_credentials_file()
+    if args.provider == 'azure':
+        from clouddns.azure import Azure
+        provider = Azure()
+        default_credentials_filename = provider.default_credentials_file()
     else:
         sys.stderr.write("Error: Unknown provider %s, cannot continue.\n\n" % args.provider)
         parser.print_help()
@@ -187,7 +191,10 @@ def main():
     current_rr = provider.get_current_ip_from_dns(hostname_to_use, domain_to_use)
     current_ip = None
     if current_rr:
-        current_ip = current_rr.data
+        if args.provider == 'rackspace':
+            current_ip = current_rr.data
+        if args.provider == 'azure':
+            current_ip = current_rr.arecords[0].ipv4_address
     if current_ip and current_ip == ip_to_use:
         print("No need to update! %s already has address of %s" % (args.hostname, ip_to_use))
         exit(0)
