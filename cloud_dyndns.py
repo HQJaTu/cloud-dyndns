@@ -46,7 +46,9 @@ def read_config_file(config_file, args_to_update):
 
     dyndns_config = config_in['dyndns']
     for key in dyndns_config.keys():
-        if not isinstance(dyndns_config[key], str) or not isinstance(dyndns_config[key], bool):
+        if isinstance(dyndns_config[key], str) or isinstance(dyndns_config[key], bool):
+            pass
+        else:
             sys.stderr.write(
                 "Error: Malformed configuration file %s. Value of key '%s' invalid. Cannot continue!\n\n" % (config_file, key))
             exit(1)
