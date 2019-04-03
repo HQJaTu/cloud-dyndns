@@ -63,7 +63,6 @@ class BaseCloud(object):
         if resp.status_code != requests.codes.ok:
             return None
 
-
         # Extract data from JSON
         data = resp.json()
         ip_addr = data['network']['interface'][0]['ipv4']['ipAddress'][0]['publicIpAddress']

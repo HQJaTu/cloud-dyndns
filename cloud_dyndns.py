@@ -61,6 +61,8 @@ def read_config_file(config_file, args_to_update):
             args_to_update.ip_address = dyndns_config[key]
         elif key == 'detect_public_ip':
             args_to_update.detect_public_ip = True
+        elif key == 'public_ip_from_platform':
+            args_to_update.detect_public_ip = dyndns_config[key]
         elif key == 'hostname':
             args_to_update.hostname = dyndns_config[key]
         elif key == 'api_user':
