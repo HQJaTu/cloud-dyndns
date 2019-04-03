@@ -95,6 +95,8 @@ def get_current_ip_from_interface(iface):
 def get_ipinfoio_address():
     resp = requests.get('http://ipinfo.io/json')
     data = resp.json()
+    if resp.status_code != requests.codes.ok:
+        return None
 
     return data['ip']
 
@@ -109,10 +111,14 @@ def main():
                         help='Cloud provider to use. Currently supported: Rackspace')
     parser.add_argument('-i', '--interface',
                         help='The interface to read IP-address from to set into DNS')
-    parser.add_argument('--ip-address',
+    parser.add_argument('--ip-address', metavar="IPV4-ADDRESS",
                         help="Don't try to read IP-address, just use a static one.")
     parser.add_argument('--ip-address-detect-public', '-d', dest='detect_public_ip', action='store_true',
                         help="Don't try to read IP-address, see what ipinfo.io detects.")
+    parser.add_argument('--ip-address-from-platform', metavar="PLATFORM-TYPE",
+                        dest='public_ip_from_platform',
+                        help="Don't try to read IP-address, see what virtualisation platform has. "
+                             "Works for AWS and Azure VMs.")
     parser.add_argument('--hostname', default=default_hostname,
                         help='The hostname to parse DNS zone and RR from. Default: %s' % default_hostname)
     parser.add_argument('--api-user',
@@ -179,6 +185,22 @@ def main():
         ip_to_use = args.ip_address
     elif args.detect_public_ip:
         ip_to_use = get_ipinfoio_address()
+        if not ip_to_use:
+            sys.stderr.write("Error: Failed to get IPv4 address from ipinfo.io")
+            exit(1)
+    elif args.public_ip_from_platform:
+        if args.public_ip_from_platform.lower() == 'aws':
+            ip_to_use = provider.get_current_ipv4_from_aws_vm_metadata()
+        elif args.public_ip_from_platform.lower() == 'azure':
+            ip_to_use = provider.get_current_ipv4_from_azure_vm_metadata()
+        else:
+            sys.stderr.write("Error: Given platform '%s' not known.\n\n" % args.public_ip_from_platform)
+            parser.print_help()
+            exit(2)
+
+        if not ip_to_use:
+            sys.stderr.write("Error: Failed to get IPv4 address from platform '%s'" % args.public_ip_from_platform)
+            exit(1)
     else:
         # Detect, check that we have interface
         if not args.interface:

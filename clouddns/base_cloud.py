@@ -18,6 +18,8 @@
 #
 # Copyright (c) Jari Turkia
 
+import requests
+
 
 class BaseCloud(object):
     """
@@ -38,3 +40,32 @@ class BaseCloud(object):
 
     def debug(self, debugging):
         raise NotImplementedError("Base class doesn't have this.")
+
+    @staticmethod
+    def get_current_ipv4_from_aws_vm_metadata():
+        # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
+        metadata_url = 'http://169.254.169.254/latest/meta-data/public-ipv4'
+        headers = {'user-agent': 'clouddns/0.1'}
+        resp = requests.get(metadata_url, headers=headers)
+        if resp.status_code != requests.codes.ok:
+            return None
+
+        data = resp.content
+
+        return data
+
+    @staticmethod
+    def get_current_ipv4_from_azure_vm_metadata():
+        # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service
+        metadata_url = 'http://169.254.169.254/metadata/instance?api-version=2018-10-01'
+        headers = {'user-agent': 'clouddns/0.1', 'Metadata': 'true'}
+        resp = requests.get(metadata_url, headers=headers)
+        if resp.status_code != requests.codes.ok:
+            return None
+
+
+        # Extract data from JSON
+        data = resp.json()
+        ip_addr = data['network']['interface'][0]['ipv4']['ipAddress'][0]['publicIpAddress']
+
+        return ip_addr
