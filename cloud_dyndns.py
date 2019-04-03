@@ -147,11 +147,11 @@ def main():
 
     # Import the implementation of given provider
     if args.provider == 'rackspace':
-        from clouddns.rackspace import Rackspace
+        from clouddns.rackspace.rackspace import Rackspace
         provider = Rackspace()
         default_credentials_filename = provider.default_credentials_file()
     if args.provider == 'azure':
-        from clouddns.azure import Azure
+        from clouddns.azure.azure import Azure
         provider = Azure()
         default_credentials_filename = provider.default_credentials_file()
     else:
@@ -205,13 +205,7 @@ def main():
         provider.authenticate(api_credentials)
 
     # Need to do anything?
-    current_rr = provider.get_current_ip_from_dns(hostname_to_use, domain_to_use)
-    current_ip = None
-    if current_rr:
-        if args.provider == 'rackspace':
-            current_ip = current_rr.data
-        if args.provider == 'azure':
-            current_ip = current_rr.arecords[0].ipv4_address
+    current_rr, current_ip = provider.get_current_ip_from_dns(hostname_to_use, domain_to_use)
     if current_ip and current_ip == ip_to_use:
         print("No need to update! %s already has address of %s" % (args.hostname, ip_to_use))
         exit(0)
