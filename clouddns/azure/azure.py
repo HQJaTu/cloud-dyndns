@@ -97,7 +97,7 @@ class Azure(BaseCloud):
         except CloudError as exc:
             if exc.status_code == 404:
                 # Nope, that record doesn't exist.
-                return None
+                return None, None
 
             raise exc
 
