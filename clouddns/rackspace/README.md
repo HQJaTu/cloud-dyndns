@@ -1,7 +1,12 @@
 # Rackspace Cloud DNS
 
 ## Installation
-See: https://github.com/HQJaTu/cloud-dyndns/tree/master/clouddns/rackspace
+1. Dependencies:
+    * `pip install -r clouddns/rackspace/requirements.txt`
+1. Dependency, Pyrax:
+    * See: https://github.com/HQJaTu/cloud-dyndns/blob/master/clouddns/rackspace/README-Pyrax.md
+    * `pip install git+https://github.com/HQJaTu/pyrax.git`
+1. Done!
 
 ## Authentication
 

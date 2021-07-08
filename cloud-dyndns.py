@@ -30,7 +30,7 @@ import json
 
 def read_config_file(config_file, args_to_update):
     config_in = None
-    with open(config_file, 'r') as stream:
+    with open(config_file, 'rt', encoding='utf8') as stream:
         try:
             config_in = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
@@ -105,7 +105,7 @@ def get_ipinfoio_address():
 
 def main():
     provider = None
-    default_hostname = socket.getfqdn()
+    default_hostname = str(socket.getfqdn())
     default_credentials_filename = None
 
     parser = argparse.ArgumentParser(description='Update interface IP-address to a Cloud DNS')
@@ -129,7 +129,7 @@ def main():
                         help='Cloud provider API key to use for authentication')
     parser.add_argument('--api-credentials-file',
                         help='JSON-file with Cloud provider API credentials.')
-    parser.add_argument('--config',
+    parser.add_argument('--config', metavar="CONFIGURATION-FILE",
                         help='YAML-configuration to use. Any command-line arguments will override config-file.')
     parser.add_argument('--dry-run', action='store_true',
                         help="Don't do any changes. Authenticate to Cloud provider and display what would be done.")
@@ -155,11 +155,11 @@ def main():
 
     # Import the implementation of given provider
     if args.provider == 'rackspace':
-        from clouddns.rackspace.rackspace import Rackspace
+        from clouddns.rackspace import Rackspace
         provider = Rackspace()
         default_credentials_filename = provider.default_credentials_file()
-    if args.provider == 'azure':
-        from clouddns.azure.azure import Azure
+    elif args.provider == 'azure':
+        from clouddns.azure import Azure
         provider = Azure()
         default_credentials_filename = provider.default_credentials_file()
     else:

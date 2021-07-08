@@ -31,5 +31,5 @@ setup(name='cloud-dyndns',
       install_requires=['netifaces', 'requests'],
       scripts=['cloud-dyndns.py'],
       include_package_data=True,
-      packages=find_packages(include=['clouddns'])
+      packages=find_packages()
       )

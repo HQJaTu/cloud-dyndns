@@ -2,7 +2,8 @@
 
 ## Installation
 1. Dependencies:
-  * `pip install -r pip install -r clouddns/azure/requirements.txt`
+   * `pip install -r clouddns/azure/requirements.txt`
+1. Done!
 
 ## Authentication
 Note: This code can only utilize service principals for authentication.
