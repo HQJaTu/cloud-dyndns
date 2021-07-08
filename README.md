@@ -47,6 +47,12 @@ documentation states following:
 Addressing a template unit requires specifying the identifying detail after at (@) sign.
 See examples below.
 
+### Installation
+1. Copy `systemd/cloud-dyndns@.service` into `/etc/systemd/system/`
+1. Reload systemd with `systemctl daemon-reload` to see the newly added unit
+1. (if `pip install`) Symlink `ln -s /usr/local/bin/cloud-dyndns.py /usr/sbin/` for tool to exist in `sbin/`.
+1. Done!
+
 ### systemd example usage
 ```bash
 systemctl start cloud-dyndns@rackspace-eth1
