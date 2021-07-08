@@ -10,7 +10,7 @@ import sys
 import json
 from pathlib import Path
 import re
-from clouddns.base_cloud import BaseCloud
+from ..base_cloud import BaseCloud
 
 
 # This file is part of Cloud DynDNS.  Cloud DynDNS is free software: you can

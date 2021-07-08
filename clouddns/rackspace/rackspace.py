@@ -10,7 +10,7 @@ import sys
 import json
 from tzlocal import get_localzone
 from pathlib import Path
-from clouddns.base_cloud import BaseCloud
+from ..base_cloud import BaseCloud
 
 
 # This file is part of Cloud DynDNS.  Cloud DynDNS is free software: you can

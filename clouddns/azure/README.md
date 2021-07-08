@@ -1,5 +1,9 @@
 # Azure DNS
 
+## Installation
+1. Dependencies:
+  * `pip install -r pip install -r clouddns/azure/requirements.txt`
+
 ## Authentication
 Note: This code can only utilize service principals for authentication.
 
@@ -7,7 +11,7 @@ Prerequirements:
 * Azure tenant ID
 * Azure subscription ID of DNS zone
 * Service principal ID and secret
-* Python module `azure-mgmt-dns`. Those not familiar with Python, you need to `pip3 install` the package.
+* Python module `azure-mgmt-dns`. Those not familiar with Python, you need to `pip install` the package.
 
 To confuse you, all four of those look like a GUID.
 

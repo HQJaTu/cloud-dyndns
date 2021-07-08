@@ -8,21 +8,44 @@ There shouldn't be any need to keep pinging a daemon somewhere or do dynamic DNS
 Just make sure there is an automated API-request sent to your own provider during system boot (or IP-address change) and be done with it!
 
 ## Installation
-Given the early stage of development, some manual tinkering is required to get this working.
 
-1. Copy file `cloud_dyndns.py` into `/usr/sbin/`
-1. Copy directory `clouddns/` into your local Python 3 library path. I'm using `/usr/lib64/python3.6/site-packages` on my distro.
+### Prerequisites
+1. Prerequisite: clone the git-repo into a local machine
+1. (optional) Prerequisite: Install Python-package _wheel_
+
+### Using `pip`
+1. Run local install:
+   * `pip install .`
+1. Done!
+
+### Manually
+If automation is not your thing, some manual tinkering to get this working.
+
+1. Copy file `cloud-dyndns.py` into `/usr/local/sbin/`
+   * Note: `pip` will land `cloud-dyndns.py` into `/usr/local/bin/`. It cannot
+     deploy into any `sbin/`.
+1. Copy directory `clouddns/` into your local Python 3 library path. I'm using
+   `/usr/local/lib64/python3.9/site-packages` on my distro.
    * To find your library paths, run: `python3 -c 'import sys; print(sys.path)'`
+1. Done!
 
 ## To Do:
-1. Create a proper Pip-package out of this
 1. Add more service providers
 1. Add documentation of appropriate `ifup`-hook to run DNS update.
 
 ## systemd support
 
-See file `cloud-dyndns@.service`.
+See file `systemd/cloud-dyndns@.service`.
 It is a systemd template service of type _oneshot_.
+
+Read https://www.freedesktop.org/software/systemd/man/systemd.unit.html for
+more information on `systemd.unit`s. Among all the information,
+documentation states following:
+> As mentioned above, a unit may be instantiated from a template file.
+> This allows creation of multiple units from a single configuration file.
+
+Addressing a template unit requires specifying the identifying detail after at (@) sign.
+See examples below.
 
 ### systemd example usage
 ```bash
@@ -38,7 +61,7 @@ A _status_ request will see how the previous run was went.
 Note: When status displays "_inactive (dead)_", that's prefectly normal. This service is not running for a very long time.
 
 ```bash
-systemctl enable cloud-dyndns@rackspace-eth1
+systemctl enable --now cloud-dyndns@rackspace-eth1
 ```
 An _enable_ will make sure the service is run on system boot.
 

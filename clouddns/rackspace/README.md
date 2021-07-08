@@ -1,8 +1,12 @@
 # Rackspace Cloud DNS
 
+## Installation
+See: https://github.com/HQJaTu/cloud-dyndns/tree/master/clouddns/rackspace
+
 ## Authentication
 
-In Rackspace management console, create an API-user with permissions: _DNS, Creator (View, Create, Edit)_ 
+In Rackspace management console, create an API-user with permissions:
+_DNS, Creator (View, Create, Edit)_
 
 The API-username and password can be:
 * used directly in configuration file (insecure)
