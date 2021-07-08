@@ -110,7 +110,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Update interface IP-address to a Cloud DNS')
     parser.add_argument('-p', '--provider',
-                        help='Cloud provider to use. Currently supported: Rackspace')
+                        help='Cloud provider to use. Currently supported: Rackspace, Azure')
     parser.add_argument('-i', '--interface',
                         help='The interface to read IP-address from to set into DNS')
     parser.add_argument('--ip-address', metavar="IPV4-ADDRESS",
