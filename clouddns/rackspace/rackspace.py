@@ -11,7 +11,7 @@ import json
 from tzlocal import get_localzone
 from pathlib import Path
 from ..base_cloud import BaseCloud
-
+import logging
 
 # This file is part of Cloud DynDNS.  Cloud DynDNS is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -27,6 +27,8 @@ from ..base_cloud import BaseCloud
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # Copyright (c) Jari Turkia
+
+log = logging.getLogger(__name__)
 
 
 class Rackspace(BaseCloud):
@@ -89,9 +91,12 @@ class Rackspace(BaseCloud):
             }
         }
 
+        log.info("Authenticated into Azure ok")
         # The file is rw- only for the current user.
         with open(os.open(self.token_file, os.O_CREAT | os.O_WRONLY, 0o600), 'w') as fp:
             json.dump(json_out, fp)
+
+        log.debug("Saved authentication data into cache file {0}".format(self.token_file))
 
     def get_current_ip_from_dns(self, host, domain):
         """
@@ -110,10 +115,13 @@ class Rackspace(BaseCloud):
             return None
 
         if len(current) > 1:
-            sys.stderr.write("Error: Multiple records for %s in domain %s. Won't continue!\n" % (host, domain))
-            exit(1)
+            log.error("Multiple records for {0} in domain {1}.".format(host, domain))
+            raise RuntimeError("Multiple records for {0} in domain {1}.".format(host, domain))
 
-        return current[0], current[0].data
+        current_ipv4 = current[0].data
+        log.info("Current IPv4 address for {0}.{1} is {2}".format(host, domain, current_ipv4))
+
+        return current[0], current_ipv4
 
     def update_rr(self, host, domain, ip, record_to_update):
         """
@@ -131,12 +139,14 @@ class Rackspace(BaseCloud):
         if record_to_update:
             # Update!
             domain_object.update_record(record_to_update, ip)
+            log.info("Updated IPv4 address for {0}.{1} as {2}".format(host, domain, ip))
         else:
             # Add!
             rec = {'type': 'A',
                    'name': '%s.%s' % (host, domain),
                    'data': ip}
             domain_object.add_record(rec)
+            log.info("Added RR for IPv4 address {0}.{1} as {2}".format(host, domain, ip))
 
     @staticmethod
     def _read_credentials_file(creds_file):
@@ -146,8 +156,8 @@ class Rackspace(BaseCloud):
         :return: tuple, API user and API key
         """
         if not os.path.isfile(creds_file):
-            sys.stderr.write("Error: Rackspace credentials file %s doesn't exist! Exiting.\n" % creds_file)
-            exit(2)
+            log.error("Error: Rackspace credentials file {0} doesn't exist!".format(creds_file))
+            raise RuntimeError("Error: Rackspace credentials file {0} doesn't exist!".format(creds_file))
 
         data = json.load(open(creds_file))
 

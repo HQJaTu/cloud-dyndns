@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import re
 from ..base_cloud import BaseCloud
-
+import logging
 
 # This file is part of Cloud DynDNS.  Cloud DynDNS is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -27,6 +27,8 @@ from ..base_cloud import BaseCloud
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # Copyright (c) Jari Turkia
+
+log = logging.getLogger(__name__)
 
 
 class Azure(BaseCloud):
@@ -51,9 +53,9 @@ class Azure(BaseCloud):
         :return:
         """
         credentials = ServicePrincipalCredentials(
-            client_id = api_creds[2],
-            secret = api_creds[3],
-            tenant = api_creds[0]
+            client_id=api_creds[2],
+            secret=api_creds[3],
+            tenant=api_creds[0]
         )
 
         self.dns_client = DnsManagementClient(
@@ -63,8 +65,10 @@ class Azure(BaseCloud):
 
         # Sanity: See that an access token exists.
         if not self.dns_client._client.config.credentials.token['is_mrrt']:
-            raise RuntimeError("Could not login!")
+            log.error("Could not login into Azure!")
+            raise RuntimeError("Could not login into Azure!")
 
+        log.info("Authenticated into Azure ok")
 
     def get_current_ip_from_dns(self, host, domain):
         """
@@ -81,10 +85,14 @@ class Azure(BaseCloud):
                 self.dns_zone = zone
                 break
         if not self.dns_zone:
-            raise RuntimeError("Didn't find domain %s" % domain)
+            log.error("Didn't find domain {0}".format(domain))
+            raise RuntimeError("Didn't find domain {0}".format(domain))
+
         resource_group_match = re.search("/resourceGroups/([^/]+)/", self.dns_zone.id)
         if not resource_group_match:
-            raise RuntimeError("Invalid internal Azure resource ID for domain %s" % domain)
+            log.error("Invalid internal Azure resource ID for domain {0}".format(domain))
+            raise RuntimeError("Invalid internal Azure resource ID for domain {0}".format(domain))
+
         self.dns_zone_rg = resource_group_match.group(1)
 
         try:
@@ -96,13 +104,18 @@ class Azure(BaseCloud):
             )
         except CloudError as exc:
             if exc.status_code == 404:
+                log.debug("No A-record for {0}.{1}. Ignored.".format(host, domain))
                 # Nope, that record doesn't exist.
                 return None, None
 
+            log.exception("Failed to read A-record for {0}.{1}".format(host, domain))
             raise exc
 
+        current_ipv4 = record_set.arecords[0].ipv4_address
+        log.info("Current IPv4 address for {0}.{1} is {2}".format(host, domain, current_ipv4))
+
         # Oh yes, we have that!
-        return record_set, record_set.arecords[0].ipv4_address
+        return record_set, current_ipv4
 
     def update_rr(self, host, domain, ip, record_to_update):
         record_set = self.dns_client.record_sets.create_or_update(
@@ -119,6 +132,7 @@ class Azure(BaseCloud):
                 ]
             }
         )
+        log.info("Updated IPv4 address for {0}.{1} as {2}".format(host, domain, ip))
 
         return record_set
 
@@ -130,10 +144,11 @@ class Azure(BaseCloud):
         :return: tuple, API user and API key
         """
         if not os.path.isfile(creds_file):
-            sys.stderr.write("Error: Azure service principal credentials file %s doesn't exist! Exiting.\n" % creds_file)
-            exit(2)
+            log.error("Azure service principal credentials file {0} doesn't exist!".format(creds_file))
+            raise RuntimeError("Azure service principal credentials file {0} doesn't exist!".format(creds_file))
 
         data = json.load(open(creds_file))
+        log.debug("Loaded Azure credentials from {0}".format(creds_file))
 
         return data['tenant-id'], data['subscription-id'], data['spn-user'], data['password']
 
@@ -147,4 +162,5 @@ class Azure(BaseCloud):
         return default_credentials_filename
 
     def debug(self, debugging):
-        pyrax.set_http_debug(debugging)
+        #pyrax.set_http_debug(debugging)
+        pass

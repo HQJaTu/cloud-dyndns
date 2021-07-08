@@ -19,6 +19,9 @@
 # Copyright (c) Jari Turkia
 
 import requests
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class BaseCloud(object):
@@ -51,6 +54,7 @@ class BaseCloud(object):
             return None
 
         data = resp.content
+        log.debug("Detected my AWS VM IPv4 address as {0}".format(data))
 
         return data
 
@@ -66,5 +70,6 @@ class BaseCloud(object):
         # Extract data from JSON
         data = resp.json()
         ip_addr = data['network']['interface'][0]['ipv4']['ipAddress'][0]['publicIpAddress']
+        log.debug("Detected my Azure VM IPv4 address as {0}".format(ip_addr))
 
         return ip_addr
