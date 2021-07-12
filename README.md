@@ -81,7 +81,8 @@ TBD: Explain how to run systemd-service on `ifup`.
 ## Service providers
 
 ### Currently supported:
-* Rackspace Cloud DNS
+* [Rackspace Cloud DNS](https://docs.rackspace.com/support/how-to/cloud-dns/)
+* [Azure DNS](https://azure.microsoft.com/en-us/services/dns/)
 
 ### Soon supported:
-* Amazon Web Services, Route 53
+* Amazon Web Services, [Route 53](https://aws.amazon.com/route53/)
