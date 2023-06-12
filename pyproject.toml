@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-dyndns"
+version = "0.8.0"
+authors = [{name = "Jari Turkia", email = "jatu@hqcodeshop.fi"}]
+description = "Systemd service to maintain DNS-entry for system with dynamic IP-address in a cloud-based DNS"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+urls = {Homepage = "https://github.com/HQJaTu/cloud-dyndns"}
+requires-python = ">=3.9, <4"
+dependencies = [
+    "netifaces==0.11.0",
+    "requests==2.31.0",
+    "PyYAML==6.0"
+]
+
+[tool.setuptools]
+packages = [
+    "clouddns",
+    "clouddns.rackspace",
+    "clouddns.azure",
+]
+include-package-data = true
+script-files = ["cloud-dyndns.py"]
